@@ -45,7 +45,6 @@ import {
   isMapType,
   isUnionType,
   IType,
-  NIL_TYPE_ID,
   TypeKind
 } from '../types/type';
 import { InferBase } from './infer-base';
@@ -63,10 +62,6 @@ export class InferLightExpression extends InferBase {
         this.context.scope,
         null
       );
-    }
-
-    if (origin.id === NIL_TYPE_ID) {
-      return origin; // early exit for nil
     }
 
     return this.invoke(origin);
@@ -181,8 +176,13 @@ export class InferLightExpression extends InferBase {
       );
     }
 
-    if (origin.id === NIL_TYPE_ID) {
-      return origin; // early exit for nil
+    if (item.index.type === ASTType.InvalidCodeExpression) {
+      return Type.createBaseType(
+        SignatureDefinitionBaseType.Any,
+        this.context.typeStorage,
+        this.context.document,
+        this.context.scope,
+      );
     }
 
     // treat index as property access
@@ -369,8 +369,13 @@ export class InferLightExpression extends InferBase {
       );
     }
 
-    if (origin.id === NIL_TYPE_ID) {
-      return origin; // early exit for nil
+    if (item.identifier.type === ASTType.InvalidCodeExpression) {
+      return Type.createBaseType(
+        SignatureDefinitionBaseType.Any,
+        this.context.typeStorage,
+        this.context.document,
+        this.context.scope,
+      );
     }
 
     const property = (item.identifier as ASTIdentifier).name;

@@ -257,6 +257,15 @@ export class InferFullExpression extends InferBase {
       );
     }
 
+    if (item.index.type === ASTType.InvalidCodeExpression) {
+      return Type.createBaseType(
+        SignatureDefinitionBaseType.Any,
+        this.context.typeStorage,
+        this.context.document,
+        this.context.scope,
+      );
+    }
+
     // treat index as property access
     if (item.index.type === ASTType.StringLiteral) {
       const fieldKey = item.index as ASTStringLiteral;
@@ -468,6 +477,15 @@ export class InferFullExpression extends InferBase {
         this.context.document,
         this.context.scope,
         null
+      );
+    }
+
+    if (item.identifier.type === ASTType.InvalidCodeExpression) {
+      return Type.createBaseType(
+        SignatureDefinitionBaseType.Any,
+        this.context.typeStorage,
+        this.context.document,
+        this.context.scope,
       );
     }
 
