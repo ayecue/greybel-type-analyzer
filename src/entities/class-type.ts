@@ -182,7 +182,8 @@ export class ClassType extends Type implements IClassType {
   setProperty(key: KeyValue, info: IEntityInfo): void {
     if (typeof key !== 'string') return;
     this.properties.set(key, info);
-    this.typeStorage.addToAny(key, info);
+    if (this.id !== SignatureDefinitionBaseType.General)
+      this.typeStorage.addToAny(key, info);
   }
 
   hasProperty(key: KeyValue): boolean {
