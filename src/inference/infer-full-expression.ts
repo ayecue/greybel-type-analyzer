@@ -278,8 +278,14 @@ export class InferFullExpression extends InferBase {
 
       // if there is a variable exit early
       if (member != null) {
+        this.completionItemKind = isFunctionType(member.type)
+          ? CompletionItemKind.Function
+          : CompletionItemKind.Property;
+
         return member.type;
       }
+
+      this.completionItemKind = CompletionItemKind.Property;
 
       const assumedType = new UnknownType(
         this.context.typeStorage,
@@ -301,11 +307,16 @@ export class InferFullExpression extends InferBase {
         this.context.scope,
         null
       );
+    
+    this.path += `[${index.id}]`;
+    this.value = null;
 
     if (isUnionType(index)) {
       const variants = index.variants
         .map((variant) => origin.getProperty(variant.getKeyType())?.type)
         .filter((type) => type != null);
+      
+      this.completionItemKind = CompletionItemKind.Property;
 
       if (variants.length === 0) {
         return Type.createBaseType(
@@ -338,9 +349,6 @@ export class InferFullExpression extends InferBase {
         this.context.scope
       );
     const member = origin.getProperty(indexKeyType);
-
-    this.path += `[${index.id}]`;
-    this.value = null;
 
     // if there is a variable exit early
     if (member != null) {

@@ -349,13 +349,11 @@ export class Document implements IDocument {
 
     if (result == null) return null;
 
-    const path = handler.getPath();
-
     return {
       item: result,
-      path,
+      path: handler.getPath(),
       value: handler.getValue(),
-      completionItemKind: assumeCompletionItemKind(result, path),
+      completionItemKind: handler.getCompletionItemKind(),
       sources: result.getSource()
     };
   }
