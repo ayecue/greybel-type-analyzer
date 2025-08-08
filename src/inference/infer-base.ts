@@ -252,11 +252,13 @@ export abstract class InferBase {
   }
 
   protected inferSliceExpression(item: ASTSliceExpression): IType {
+    const result = this.infer(item.base);
+
     this.path += PathType.Slice;
     this.completionItemKind = CompletionItemKind.Expression;
     this.value = null;
 
-    return this.infer(item.base);
+    return result;
   }
 
   protected inferConstantIdentifier(item: ASTIdentifier): IType {
