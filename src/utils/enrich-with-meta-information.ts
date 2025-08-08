@@ -7,6 +7,7 @@ import {
   TypeParser
 } from 'meta-utils';
 
+import { DEFAULT_CUSTOM_FUNCTION_DESCRIPTION } from '../types/inference';
 import { ITypeStorage } from '../types/storage';
 import { META_DOCS_SIGNATURE_ORIGIN, TypeKind } from '../types/type';
 import { createCommentBlock } from './create-comment-block';
@@ -14,6 +15,7 @@ import { createCommentBlock } from './create-comment-block';
 export enum FunctionBlockTag {
   Description = 'description',
   Param = 'param',
+  Params = 'params',
   Return = 'return',
   Returns = 'returns',
   Example = 'example'
@@ -57,7 +59,15 @@ function parseArgType(
   };
 }
 
-function parseFunctionBlock(def: Block) {
+interface FunctionBlockDefinition {
+  descriptions?: string;
+  args?: SignaturePayloadDefinitionArg[];
+  returns?: SignaturePayloadDefinitionTypeMeta[];
+  examples?: string[];
+}
+
+function parseFunctionBlock(def: Block): FunctionBlockDefinition {
+  const definition: FunctionBlockDefinition = {};
   const descriptions = [
     def.description ?? '',
     ...def.tags
@@ -67,9 +77,12 @@ function parseFunctionBlock(def: Block) {
       .map(parseDescription)
   ].join('\n\n');
   const args: SignaturePayloadDefinitionArg[] = def.tags
-    .filter((it) => it.tag === FunctionBlockTag.Param)
+    .filter(
+      (it) =>
+        it.tag === FunctionBlockTag.Param || it.tag === FunctionBlockTag.Params
+    )
     .map(parseArgType);
-  let returns = def.tags
+  const returns = def.tags
     .filter(
       (it) =>
         it.tag === FunctionBlockTag.Return ||
@@ -80,16 +93,12 @@ function parseFunctionBlock(def: Block) {
     .filter((it) => it.tag === FunctionBlockTag.Example)
     .map(parseExample);
 
-  if (returns.length === 0) {
-    returns = parseReturnType({ type: SignatureDefinitionBaseType.Any });
-  }
+  if (descriptions.length > 0) definition.descriptions = descriptions;
+  if (args.length > 0) definition.args = args;
+  if (returns.length > 0) definition.returns = returns;
+  if (examples.length > 0) definition.examples = examples;
 
-  return {
-    descriptions,
-    args,
-    returns,
-    examples
-  };
+  return definition;
 }
 
 function isSupportedTag(item: Pick<Spec, 'tag'>) {
@@ -120,16 +129,24 @@ export function enrichWithMetaInformation(
         const types = item.getTypes().map((it) => it.toString());
         const opt = item.isOptional();
 
+        if (commentArgs && commentArgs[index]) {
+          return {
+            types,
+            opt,
+            ...commentArgs[index],
+            label
+          };
+        }
+
         return {
           types,
           opt,
-          ...commentArgs[index],
           label
         };
       }),
-      returns: commentReturn,
-      description: commentDescription,
-      example: commentExample
+      returns: commentReturn || item.getReturns(),
+      description: commentDescription || DEFAULT_CUSTOM_FUNCTION_DESCRIPTION,
+      example: commentExample || item.getExample()
     }) as SignatureDefinitionFunction;
   }
 

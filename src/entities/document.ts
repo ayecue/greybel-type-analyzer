@@ -28,10 +28,10 @@ import {
   IEntityInfo,
   IFunctionType,
   IType,
-  META_DOCS_SIGNATURE_ORIGIN,
   NIL_TYPE_ID,
   SymbolInfo,
-  TypeKind
+  TypeKind,
+  UNKNOWN_TYPE_ID
 } from '../types/type';
 import { ITypeManager } from '../types/type-manager';
 import { ChunkHelper } from '../utils/chunk-helper';
@@ -246,10 +246,6 @@ export class Document implements IDocument {
       return;
     }
 
-    const hasMetaDocs =
-      scopeMetadata.scope.associatedFunction.signature.getOrigin() ===
-      META_DOCS_SIGNATURE_ORIGIN;
-
     // Define the function arguments in the scope
     const fnDef = scopeMetadata.scope.associatedFunction
       .signature as SignatureDefinitionFunction;
@@ -270,7 +266,9 @@ export class Document implements IDocument {
 
     scopeEvaluationsBuilder.aggregate();
 
-    if (!hasMetaDocs) {
+    const returnTypes = fnDef.getReturns();
+
+    if (returnTypes.length === 1 && returnTypes[0].type === UNKNOWN_TYPE_ID) {
       this.assumeReturnType(
         scope as ASTFunctionStatement,
         scopeMetadata,

@@ -58,7 +58,8 @@ import {
   isMapType,
   isUnionType,
   IType,
-  TypeKind
+  TypeKind,
+  UNKNOWN_TYPE_ID
 } from '../types/type';
 import { determineTypeFromMeta } from '../utils/determine-type-from-meta';
 import { enrichWithMetaInformation } from '../utils/enrich-with-meta-information';
@@ -262,7 +263,7 @@ export class InferFullExpression extends InferBase {
         SignatureDefinitionBaseType.Any,
         this.context.typeStorage,
         this.context.document,
-        this.context.scope,
+        this.context.scope
       );
     }
 
@@ -400,7 +401,7 @@ export class InferFullExpression extends InferBase {
             ]
           };
         }),
-        returns: [SignatureDefinitionBaseType.Any]
+        returns: [UNKNOWN_TYPE_ID]
       }
     ) as SignatureDefinitionFunction;
     const type = new FunctionType(
@@ -485,7 +486,7 @@ export class InferFullExpression extends InferBase {
         SignatureDefinitionBaseType.Any,
         this.context.typeStorage,
         this.context.document,
-        this.context.scope,
+        this.context.scope
       );
     }
 

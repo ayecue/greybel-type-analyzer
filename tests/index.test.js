@@ -439,7 +439,7 @@ describe('type-manager', () => {
       const scope = doc.globals;
       const returnType = scope.getProperty('test').type.getReturnType();
 
-      expect(returnType.id).toEqual('any');
+      expect(returnType.id).toEqual('null');
     });
 
     test('should use default return when invalid tag is used', () => {
@@ -459,7 +459,7 @@ describe('type-manager', () => {
       expect(signature.getDescription()).toContain('@public');
       expect(signature.getDescription()).not.toContain('@description');
       expect(signature.getExample().join('\n')).not.toContain('@example');
-      expect(returnType.type).toEqual('any');
+      expect(returnType.type).toEqual('null');
     });
 
     test('should override type resolve via define', () => {

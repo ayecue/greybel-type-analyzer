@@ -37,8 +37,10 @@ import {
 import {
   ISA_PROPERTY,
   isFunctionType,
+  isListType,
   isMapType,
   IType,
+  MAX_STRING_LENGTH,
   NIL_TYPE_ID,
   TypeKind
 } from '../types/type';
@@ -76,6 +78,8 @@ export abstract class InferBase {
   }
 
   protected invoke(item: IType): IType {
+    let returnType: IType | null = null;
+
     if (isFunctionType(item)) {
       // If the function scope is not yet aggregated, we need to do it now
       const scopeMetadata = this.context.document.scopeFnMapping.get(item);
@@ -86,18 +90,32 @@ export abstract class InferBase {
         );
       }
 
-      return item.invoke(
+      returnType = item.invoke(
+        this.context.typeStorage,
+        this.context.document,
+        this.context.scope
+      );
+    } else {
+      returnType = item.invoke(
         this.context.typeStorage,
         this.context.document,
         this.context.scope
       );
     }
 
-    return item.invoke(
-      this.context.typeStorage,
-      this.context.document,
-      this.context.scope
-    );
+    if (isFunctionType(returnType)) {
+      this.completionItemKind = CompletionItemKind.Function;
+    } else if (isMapType(returnType)) {
+      this.completionItemKind = CompletionItemKind.MapConstructor;
+    } else if (isListType(returnType)) {
+      this.completionItemKind = CompletionItemKind.ListConstructor;
+    } else {
+      this.completionItemKind = CompletionItemKind.Variable;
+    }
+
+    this.value = null;
+
+    return returnType;
   }
 
   protected checkSkipNextInvoke(): boolean {
@@ -350,10 +368,14 @@ export abstract class InferBase {
       this.context.scope,
       null
     );
+    const value =
+      item.value.length > MAX_STRING_LENGTH
+        ? `${item.value.slice(0, MAX_STRING_LENGTH)}...`
+        : item.value;
 
-    this.path += PathType.String;
+    this.path += value;
     this.completionItemKind = CompletionItemKind.Literal;
-    this.value = `"${item.value}"`;
+    this.value = value;
 
     return type;
   }
@@ -367,7 +389,7 @@ export abstract class InferBase {
       null
     );
 
-    this.path += PathType.Number;
+    this.path += item.value.toString();
     this.completionItemKind = CompletionItemKind.Literal;
     this.value = item.value.toString();
 

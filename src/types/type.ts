@@ -14,6 +14,7 @@ import type { IScope } from './scope';
 import type { ITypeStorage } from './storage';
 
 export type TypeId = string;
+export const MAX_STRING_LENGTH = 10;
 export const MAX_ALL_PROPERTIES_DEPTH = 10;
 export const MAX_TO_META_DEPTH = 3;
 export const NIL_TYPE_ID: TypeId = 'null' as const;

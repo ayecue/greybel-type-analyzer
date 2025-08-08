@@ -181,7 +181,7 @@ export class InferLightExpression extends InferBase {
         SignatureDefinitionBaseType.Any,
         this.context.typeStorage,
         this.context.document,
-        this.context.scope,
+        this.context.scope
       );
     }
 
@@ -374,7 +374,7 @@ export class InferLightExpression extends InferBase {
         SignatureDefinitionBaseType.Any,
         this.context.typeStorage,
         this.context.document,
-        this.context.scope,
+        this.context.scope
       );
     }
 

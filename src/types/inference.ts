@@ -33,14 +33,14 @@ export enum UnaryType {
 }
 
 export enum PathType {
-  Map = '$map',
-  List = '$list',
+  Map = '{}',
+  List = '[]',
   String = '$string',
   Number = '$number',
-  Nil = '$null',
-  Slice = '$slice',
-  Function = '$function',
-  Expression = '$expression'
+  Nil = 'null',
+  Slice = '[:]',
+  Function = 'function',
+  Expression = ':expression:',
 }
 
 export interface IInferContext {
