@@ -370,8 +370,8 @@ export abstract class InferBase {
     );
     const value =
       item.value.length > MAX_STRING_LENGTH
-        ? `${item.value.slice(0, MAX_STRING_LENGTH)}...`
-        : item.value;
+        ? `"${item.value.slice(0, MAX_STRING_LENGTH)}..."`
+        : `"${item.value}"`;
 
     this.path += value;
     this.completionItemKind = CompletionItemKind.Literal;
