@@ -37,7 +37,6 @@ import {
 import {
   ISA_PROPERTY,
   isFunctionType,
-  isListType,
   isMapType,
   IType,
   MAX_STRING_LENGTH,
@@ -48,6 +47,7 @@ import { determineTypeFromMeta } from '../utils/determine-type-from-meta';
 import { normalizeText } from '../utils/normalize-text';
 import { parseAssignDescription } from '../utils/parse-assign-description';
 import { InferContext } from './infer-context';
+import { assumeCompletionItemKind } from '../utils/assume-completion-item-kind';
 
 export abstract class InferBase {
   protected context: InferContext;
@@ -103,16 +103,7 @@ export abstract class InferBase {
       );
     }
 
-    if (isFunctionType(returnType)) {
-      this.completionItemKind = CompletionItemKind.Function;
-    } else if (isMapType(returnType)) {
-      this.completionItemKind = CompletionItemKind.MapConstructor;
-    } else if (isListType(returnType)) {
-      this.completionItemKind = CompletionItemKind.ListConstructor;
-    } else {
-      this.completionItemKind = CompletionItemKind.Variable;
-    }
-
+    this.completionItemKind = assumeCompletionItemKind(returnType, this.path);
     this.value = null;
 
     return returnType;

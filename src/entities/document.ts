@@ -27,6 +27,9 @@ import { IScope, IScopeMetadata, ScopeState } from '../types/scope';
 import {
   IEntityInfo,
   IFunctionType,
+  isFunctionType,
+  isListType,
+  isMapType,
   IType,
   NIL_TYPE_ID,
   SymbolInfo,
@@ -40,6 +43,8 @@ import { mergeScope } from '../utils/merge-helper';
 import { Scope } from './scope';
 import { Type } from './type';
 import { UnionType } from './union-type';
+import { CompletionItemKind } from '../types/completion';
+import { assumeCompletionItemKind } from '../utils/assume-completion-item-kind';
 
 export class Document implements IDocument {
   public readonly name: string;
@@ -344,11 +349,13 @@ export class Document implements IDocument {
 
     if (result == null) return null;
 
+    const path = handler.getPath();
+
     return {
       item: result,
-      path: handler.getPath(),
+      path,
       value: handler.getValue(),
-      completionItemKind: handler.getCompletionItemKind(),
+      completionItemKind: assumeCompletionItemKind(result, path),
       sources: result.getSource()
     };
   }
