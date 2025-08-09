@@ -43,11 +43,11 @@ import {
   NIL_TYPE_ID,
   TypeKind
 } from '../types/type';
+import { assumeCompletionItemKind } from '../utils/assume-completion-item-kind';
 import { determineTypeFromMeta } from '../utils/determine-type-from-meta';
 import { normalizeText } from '../utils/normalize-text';
 import { parseAssignDescription } from '../utils/parse-assign-description';
 import { InferContext } from './infer-context';
-import { assumeCompletionItemKind } from '../utils/assume-completion-item-kind';
 
 export abstract class InferBase {
   protected context: InferContext;

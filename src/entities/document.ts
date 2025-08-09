@@ -27,9 +27,6 @@ import { IScope, IScopeMetadata, ScopeState } from '../types/scope';
 import {
   IEntityInfo,
   IFunctionType,
-  isFunctionType,
-  isListType,
-  isMapType,
   IType,
   NIL_TYPE_ID,
   SymbolInfo,
@@ -43,8 +40,6 @@ import { mergeScope } from '../utils/merge-helper';
 import { Scope } from './scope';
 import { Type } from './type';
 import { UnionType } from './union-type';
-import { CompletionItemKind } from '../types/completion';
-import { assumeCompletionItemKind } from '../utils/assume-completion-item-kind';
 
 export class Document implements IDocument {
   public readonly name: string;
@@ -154,16 +149,14 @@ export class Document implements IDocument {
             : paramItem
         )
       );
-      const unionType = new UnionType(
-        this.typeStorage.generateId(TypeKind.UnionType),
-        argTypes,
-        this.typeStorage,
-        this,
-        scopeMetadata.scope
-      );
       scopeMetadata.scope.setProperty(
         arg.getLabel(),
-        unionType.variants.length === 1 ? unionType.variants[0] : unionType
+        UnionType.createSmartly(
+          argTypes,
+          this.typeStorage,
+          this,
+          scopeMetadata.scope
+        )
       );
     }
   }
@@ -220,7 +213,7 @@ export class Document implements IDocument {
     }
 
     const returnItem =
-      returnType.variants.length === 1 ? returnType.variants[0] : returnType;
+      returnType.variants.length === 1 ? returnType.firstVariant() : returnType;
 
     scopeMetadata.scope.associatedFunction.returnType = returnItem;
     // @ts-expect-error

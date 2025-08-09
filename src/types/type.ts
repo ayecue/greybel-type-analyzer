@@ -198,6 +198,7 @@ export function isListType(type: IType): type is IListType {
 export interface IUnionType extends IType {
   readonly variants: IType[];
 
+  firstVariant(): IType | null;
   containsVariant(type: IType): boolean;
   addVariant(type: IType): void;
 }

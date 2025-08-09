@@ -232,6 +232,8 @@ export class InferLightExpression extends InferBase {
         .map((variant) => origin.getProperty(variant.getKeyType())?.type)
         .filter((type) => type != null);
 
+      this.completionItemKind = CompletionItemKind.Property;
+
       if (variants.length === 0) {
         return Type.createBaseType(
           SignatureDefinitionBaseType.Any,
@@ -241,7 +243,7 @@ export class InferLightExpression extends InferBase {
           null
         );
       } else if (variants.length === 1) {
-        return variants[0];
+        return index.firstVariant();
       }
 
       return new UnionType(

@@ -307,7 +307,7 @@ export class InferFullExpression extends InferBase {
         this.context.scope,
         null
       );
-    
+
     this.path += `[${index.id}]`;
     this.value = null;
 
@@ -315,7 +315,7 @@ export class InferFullExpression extends InferBase {
       const variants = index.variants
         .map((variant) => origin.getProperty(variant.getKeyType())?.type)
         .filter((type) => type != null);
-      
+
       this.completionItemKind = CompletionItemKind.Property;
 
       if (variants.length === 0) {
@@ -327,7 +327,7 @@ export class InferFullExpression extends InferBase {
           null
         );
       } else if (variants.length === 1) {
-        return variants[0];
+        return index.firstVariant();
       }
 
       return new UnionType(

@@ -42,6 +42,36 @@ export class UnionType extends Type implements IUnionType {
     );
   }
 
+  static createSmartly(
+    variants: Type[],
+    typeStorage: ITypeStorage,
+    document?: IDocument,
+    scope?: IScope,
+    astRef?: ASTBase
+  ): IType {
+    const newUnion = new UnionType(
+      typeStorage.generateId(TypeKind.UnionType, astRef),
+      variants,
+      typeStorage,
+      document,
+      scope,
+      astRef
+    );
+
+    if (newUnion.variants.length === 0) {
+      return Type.createBaseType(
+        SignatureDefinitionBaseType.Any,
+        typeStorage || newUnion.typeStorage,
+        document || newUnion.document,
+        scope || newUnion.scope
+      );
+    } else if (newUnion.variants.length === 1) {
+      return newUnion.firstVariant();
+    }
+
+    return newUnion;
+  }
+
   constructor(
     id: string,
     variants: Type[],
@@ -50,7 +80,7 @@ export class UnionType extends Type implements IUnionType {
     scope?: IScope,
     astRef?: ASTBase
   ) {
-    super(id, TypeKind.UnionType, id, typeStorage, document, scope, astRef);
+    super(id, TypeKind.UnionType, null, typeStorage, document, scope, astRef);
     this.variants = variants;
     this.uniquifyVariants();
   }
@@ -77,6 +107,10 @@ export class UnionType extends Type implements IUnionType {
 
     this.variants.length = 0;
     this.variants.push(...variants);
+  }
+
+  firstVariant(): Type | undefined {
+    return this.variants.length > 0 ? this.variants[0] : undefined;
   }
 
   containsVariant(type: Type): boolean {
@@ -122,8 +156,7 @@ export class UnionType extends Type implements IUnionType {
 
     return new EntityInfo(
       properties[0].name,
-      new UnionType(
-        this.typeStorage.generateId(TypeKind.UnionType),
+      UnionType.createSmartly(
         properties.map((info) => info.type),
         this.typeStorage,
         this.document,
@@ -166,8 +199,7 @@ export class UnionType extends Type implements IUnionType {
     scope?: IScope,
     astRef?: ASTBase
   ): IType {
-    return new UnionType(
-      this.typeStorage.generateId(TypeKind.UnionType, astRef),
+    return UnionType.createSmartly(
       this.variants.map((variant) =>
         variant.invoke(
           typeStorage || this.typeStorage,

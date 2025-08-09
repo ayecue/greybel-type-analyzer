@@ -40,7 +40,7 @@ export enum PathType {
   Nil = 'null',
   Slice = '[:]',
   Function = 'function',
-  Expression = ':expression:',
+  Expression = ':expression:'
 }
 
 export interface IInferContext {
