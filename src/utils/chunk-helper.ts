@@ -69,6 +69,11 @@ export class ChunkHelper implements IChunkHelper {
     switch (item.type) {
       case ASTType.MemberExpression: {
         const memberExpr = item as ASTMemberExpression;
+
+        if (memberExpr.identifier.type !== ASTType.Identifier) {
+          return null;
+        }
+
         return {
           resolvePath: memberExpr.base,
           lastProperty: (memberExpr.identifier as ASTIdentifier).name,
