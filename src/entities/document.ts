@@ -23,6 +23,7 @@ import {
   IDocumentMergeItem,
   IResolveNamespaceResult
 } from '../types/document';
+import { ConstantIdentifier } from '../types/inference';
 import { IScope, IScopeMetadata, ScopeState } from '../types/scope';
 import {
   IEntityInfo,
@@ -133,9 +134,17 @@ export class Document implements IDocument {
     fnDef: SignatureDefinitionFunction
   ): void {
     const args = fnDef.getArguments();
+    const selfContext = scopeMetadata.scope.getSelf();
 
     for (let index = 0; index < args.length; index++) {
       const arg = args[index];
+      const label = arg.getLabel();
+
+      if (label === ConstantIdentifier.Self && selfContext != null) {
+        scopeMetadata.scope.setProperty(label, selfContext);
+        continue;
+      }
+
       const types = arg.getTypes();
       const paramItem = scope.parameters[index];
       const argTypes = types.map((it) =>
@@ -150,7 +159,7 @@ export class Document implements IDocument {
         )
       );
       scopeMetadata.scope.setProperty(
-        arg.getLabel(),
+        label,
         UnionType.createSmartly(
           argTypes,
           this.typeStorage,

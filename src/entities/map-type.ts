@@ -156,12 +156,27 @@ export class MapType extends Type implements IMapType {
     const queue = [...path];
     const lastKey = queue.pop();
     let current: IType = this;
+    let previous: IType = null;
 
     while (queue.length > 0) {
+      if (!current.containsOwnProperties()) {
+        return;
+      }
+
       const currentPath = queue.shift()!;
+      previous = current;
       current = current.getProperty(currentPath)?.type;
       if (current == null) {
-        return;
+        const newProperty = MapType.createDefault(
+          this.typeStorage,
+          this.document,
+          this.scope
+        );
+        previous.setProperty(
+          currentPath,
+          new EntityInfo(currentPath, newProperty)
+        );
+        current = newProperty;
       }
     }
 
