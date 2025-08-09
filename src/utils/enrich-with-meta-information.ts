@@ -120,6 +120,11 @@ export function enrichWithMetaInformation(
       returns: commentReturn,
       examples: commentExample
     } = parseFunctionBlock(commentDef);
+    const commentsArgMap = new Map<string, SignaturePayloadDefinitionArg>();
+
+    if (commentArgs) {
+      commentArgs.forEach((arg) => commentsArgMap.set(arg.label, arg));
+    }
 
     return SignatureDefinitionFunction.parse(META_DOCS_SIGNATURE_ORIGIN, {
       id: typeStorage.generateId(TypeKind.FunctionType),
@@ -129,18 +134,10 @@ export function enrichWithMetaInformation(
         const types = item.getTypes().map((it) => it.toString());
         const opt = item.isOptional();
 
-        if (commentArgs && commentArgs[index]) {
-          return {
-            types,
-            opt,
-            ...commentArgs[index],
-            label
-          };
-        }
-
         return {
           types,
           opt,
+          ...commentsArgMap.get(label),
           label
         };
       }),

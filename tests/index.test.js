@@ -431,7 +431,7 @@ describe('type-manager', () => {
     test('should return any when missing return', () => {
       const doc = getDocument(`
         // Hello world
-        // @param {number}
+        // @param {number} a
         test = function(a)
         end function
         output = test
@@ -579,8 +579,8 @@ describe('type-manager', () => {
       const doc = getDocument(`
         // @return {list<string>}
         foo = function
-          // @param {string}
-          // @param {string}
+          // @param {string} a
+          // @param {string} b
           // @return {list<string>}
           globals.test = function(a, b)
 
@@ -1257,7 +1257,6 @@ describe('type-manager', () => {
         foo.xxx = "was"
 
         // @description This function returns a file!
-        // @param {string} name
         // @return {test}
         bar = function
         end function
@@ -1298,7 +1297,6 @@ describe('type-manager', () => {
         foo.xxx = "was"
 
         // @description This function returns a file!
-        // @param {string} name
         // @return {test}
         bar = function
         end function
@@ -1321,7 +1319,6 @@ describe('type-manager', () => {
         foo.xxx = "was"
 
         // @description This function returns a file!
-        // @param {string} name
         // @return {test}
         bar = function
         end function
@@ -1347,7 +1344,6 @@ describe('type-manager', () => {
         teq = new foo
 
         // @description This function returns a file!
-        // @param {string} name
         // @return {teq}
         bar = function
         end function
@@ -1368,7 +1364,6 @@ describe('type-manager', () => {
         foo.xxx = "was"
 
         // @description This function returns a file!
-        // @param {string} name
         // @return {test}
         bar = function
         end function
