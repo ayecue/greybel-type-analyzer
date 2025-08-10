@@ -261,7 +261,9 @@ export class MapType extends Type implements IMapType {
     return true;
   }
 
-  getAllProperties(depth: number = 1): PropertyInfo[] {
+  getAllProperties(
+    depth: number = 1
+  ): PropertyInfo[] {
     if (depth > MAX_ALL_PROPERTIES_DEPTH) return [];
     const properties: Map<string, PropertyInfo> = new Map();
 
@@ -289,7 +291,7 @@ export class MapType extends Type implements IMapType {
       }
     }
 
-    if (this.inheritFrom && !this.isScope) {
+    if (this.inheritFrom) {
       const inerhitType = this.typeStorage.getTypeById(this.inheritFrom);
       for (const property of inerhitType.getAllProperties(depth + 1)) {
         if (!properties.has(property.name)) {

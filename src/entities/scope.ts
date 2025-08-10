@@ -9,6 +9,7 @@ import {
   IFunctionType,
   IMapType,
   ISA_PROPERTY,
+  isFunctionType,
   isMapType,
   IType,
   KeyValue,
@@ -93,8 +94,22 @@ export class Scope implements IScope {
   getAllProperties(depth: number = 1): PropertyInfo[] {
     if (depth > MAX_ALL_PROPERTIES_DEPTH) return [];
     const properties: Map<string, PropertyInfo> = new Map();
+
+    // only get properties from locals
+    for (const [key, info] of this.locals.properties) {
+      if (typeof key !== 'string') continue;
+      if (!properties.has(key)) {
+        properties.set(key, {
+          type: info.type,
+          name: info.name,
+          kind: isFunctionType(info.type)
+            ? CompletionItemKind.Function
+            : CompletionItemKind.Variable
+        });
+      }
+    }
+
     const allProperties = [
-      ...this.locals.getAllProperties(depth + 1),
       ...(this.globals !== this
         ? this.globals.getAllProperties(depth + 1)
         : []),
