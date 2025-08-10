@@ -67,6 +67,10 @@ export class ASTDefinitionAggregator {
       this.document.chunkHelper.findAssignmentVariableSetterContext(
         resolvePath
       );
+    
+    if (variableSetterCtx == null) {
+      return;
+    }
 
     if (isVariableSetterContextVariable(variableSetterCtx)) {
       this.scope.setProperty(
