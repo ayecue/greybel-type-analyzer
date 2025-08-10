@@ -33,8 +33,10 @@ export class TypeStorage implements ITypeStorage {
   }
 
   addType(type: IClassType): void {
-    if (this.typeInterfaces.has(type.id)) {
-      throw new Error(`Type with id ${type.id} already exists.`);
+    const existingType = this.typeInterfaces.get(type.id);
+    if (existingType) {
+      existingType.merge(type);
+      return;
     }
     this.typeInterfaces.set(type.id, type);
   }
@@ -69,7 +71,7 @@ export class TypeStorage implements ITypeStorage {
 
   addKeyType(keyType: IKeyType): void {
     if (this.keyTypes.has(keyType.id)) {
-      throw new Error(`KeyType with id ${keyType.id} already exists.`);
+      return;
     }
     this.keyTypes.set(keyType.id, keyType);
   }

@@ -329,6 +329,7 @@ export class ClassType extends Type implements IClassType {
     }
 
     for (const [key, value] of source.properties) {
+      if (this.properties.has(key)) continue;
       this.properties.set(key, new EntityInfo(value.name, value.type));
     }
 
