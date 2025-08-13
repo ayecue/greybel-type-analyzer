@@ -1,3 +1,4 @@
+import { Operator } from 'miniscript-core';
 import type { IDocument } from './document';
 import type { IScope } from './scope';
 
@@ -47,3 +48,16 @@ export interface IInferContext {
   readonly document: IDocument;
   readonly scope: IScope;
 }
+
+
+export const SIMPLE_BINARY_OPERATORS_SET: Set<string> = new Set(
+  [
+    Operator.Modulo,
+    Operator.Equal,
+    Operator.NotEqual,
+    Operator.GreaterThan,
+    Operator.GreaterThanOrEqual,
+    Operator.LessThan,
+    Operator.LessThanOrEqual
+  ]
+);

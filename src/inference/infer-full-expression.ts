@@ -47,6 +47,7 @@ import {
   ConstantIdentifier,
   ConstantIdentifierSet,
   PathType,
+  SIMPLE_BINARY_OPERATORS_SET,
   UnaryType
 } from '../types/inference';
 import {
@@ -158,6 +159,20 @@ export class InferFullExpression extends InferBase {
   }
 
   protected inferBinaryExpression(item: ASTBinaryExpression): IType {
+    if (SIMPLE_BINARY_OPERATORS_SET.has(item.operator)) {
+      this.path += PathType.Expression;
+      this.completionItemKind = CompletionItemKind.Expression;
+      this.value = null;
+
+      return Type.createBaseType(
+        SignatureDefinitionBaseType.Number,
+        this.context.typeStorage,
+        this.context.document,
+        this.context.scope,
+        null
+      );
+    }
+
     const left =
       new InferFullExpression(this.context).infer(item.left) ||
       Type.createBaseType(
@@ -181,67 +196,14 @@ export class InferFullExpression extends InferBase {
     this.completionItemKind = CompletionItemKind.Expression;
     this.value = null;
 
-    const leftKey = left.getKeyType();
-    const rightKey = right.getKeyType();
-
-    if (leftKey?.id === rightKey?.id) {
-      if (isMapType(left)) {
-        return shallowMergeMap(left, right);
-      } else if (isListType(left)) {
-        return shallowMergeList(left, right);
-      } else if (isUnionType(left)) {
-        return new UnionType(
-          this.context.typeStorage.generateId(TypeKind.UnionType, item),
-          [left, right],
-          this.context.typeStorage,
-          this.context.document,
-          this.context.scope,
-          null
-        );
-      }
-
-      return Type.createBaseType(
-        left.id,
-        this.context.typeStorage,
-        this.context.document,
-        this.context.scope,
-        null
-      );
+    switch (item.operator) {
+      case Operator.Plus:
+        return this.handleBinaryAddOperation(left, right);
+      case Operator.Asterik:
+        return this.handleBinaryMultiplyOperation(left, right);
+      default:
+        return this.handleDefaultMathOperation(left, right);
     }
-
-    if (
-      left.id === SignatureDefinitionBaseType.String ||
-      right.id === SignatureDefinitionBaseType.String
-    ) {
-      // If one of the types is a string, we return a string type
-      return Type.createBaseType(
-        SignatureDefinitionBaseType.String,
-        this.context.typeStorage,
-        this.context.document,
-        this.context.scope,
-        null
-      );
-    } else if (
-      left.id === SignatureDefinitionBaseType.Number ||
-      right.id === SignatureDefinitionBaseType.Number
-    ) {
-      // If one of the types is a number, we return a number type
-      return Type.createBaseType(
-        SignatureDefinitionBaseType.Number,
-        this.context.typeStorage,
-        this.context.document,
-        this.context.scope,
-        null
-      );
-    }
-
-    return Type.createBaseType(
-      SignatureDefinitionBaseType.Any,
-      this.context.typeStorage,
-      this.context.document,
-      this.context.scope,
-      null
-    );
   }
 
   protected inferIndexExpression(item: ASTIndexExpression): IType {

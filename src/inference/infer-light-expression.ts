@@ -25,7 +25,8 @@ import {
   ASTSliceExpression,
   ASTStringLiteral,
   ASTType,
-  ASTUnaryExpression
+  ASTUnaryExpression,
+  Operator
 } from 'miniscript-core';
 
 import { EntityInfo } from '../entities/entity-info';
@@ -37,7 +38,8 @@ import { CompletionItemKind } from '../types/completion';
 import {
   ConstantIdentifier,
   ConstantIdentifierSet,
-  PathType
+  PathType,
+  SIMPLE_BINARY_OPERATORS_SET
 } from '../types/inference';
 import {
   isFunctionType,
@@ -68,6 +70,20 @@ export class InferLightExpression extends InferBase {
   }
 
   protected inferBinaryExpression(item: ASTBinaryExpression): IType {
+    if (SIMPLE_BINARY_OPERATORS_SET.has(item.operator)) {
+      this.path += PathType.Expression;
+      this.completionItemKind = CompletionItemKind.Expression;
+      this.value = null;
+
+      return Type.createBaseType(
+        SignatureDefinitionBaseType.Number,
+        this.context.typeStorage,
+        this.context.document,
+        this.context.scope,
+        null
+      );
+    }
+
     const left =
       new InferLightExpression(this.context).infer(item.left) ||
       Type.createBaseType(
@@ -87,79 +103,18 @@ export class InferLightExpression extends InferBase {
         null
       );
 
-    const leftKey = left.getKeyType();
-    const rightKey = right.getKeyType();
+    this.path += PathType.Expression;
+    this.completionItemKind = CompletionItemKind.Expression;
+    this.value = null;
 
-    if (leftKey?.id === rightKey?.id) {
-      if (isMapType(left)) {
-        return Type.createBaseType(
-          SignatureDefinitionBaseType.Map,
-          this.context.typeStorage,
-          this.context.document,
-          this.context.scope,
-          null
-        );
-      } else if (isListType(left)) {
-        return Type.createBaseType(
-          SignatureDefinitionBaseType.List,
-          this.context.typeStorage,
-          this.context.document,
-          this.context.scope,
-          null
-        );
-      } else if (isUnionType(left)) {
-        return new UnionType(
-          this.context.typeStorage.generateId(TypeKind.UnionType, item),
-          [left, right],
-          this.context.typeStorage,
-          this.context.document,
-          this.context.scope,
-          null
-        );
-      }
-
-      return Type.createBaseType(
-        left.id,
-        this.context.typeStorage,
-        this.context.document,
-        this.context.scope,
-        null
-      );
+    switch (item.operator) {
+      case Operator.Plus:
+        return this.handleBinaryAddOperation(left, right);
+      case Operator.Asterik:
+        return this.handleBinaryMultiplyOperation(left, right);
+      default:
+        return this.handleDefaultMathOperation(left, right);
     }
-
-    if (
-      left.id === SignatureDefinitionBaseType.String ||
-      right.id === SignatureDefinitionBaseType.String
-    ) {
-      // If one of the types is a string, we return a string type
-      return Type.createBaseType(
-        SignatureDefinitionBaseType.String,
-        this.context.typeStorage,
-        this.context.document,
-        this.context.scope,
-        null
-      );
-    } else if (
-      left.id === SignatureDefinitionBaseType.Number ||
-      right.id === SignatureDefinitionBaseType.Number
-    ) {
-      // If one of the types is a number, we return a number type
-      return Type.createBaseType(
-        SignatureDefinitionBaseType.Number,
-        this.context.typeStorage,
-        this.context.document,
-        this.context.scope,
-        null
-      );
-    }
-
-    return Type.createBaseType(
-      SignatureDefinitionBaseType.Any,
-      this.context.typeStorage,
-      this.context.document,
-      this.context.scope,
-      null
-    );
   }
 
   protected inferIndexExpression(item: ASTIndexExpression): IType {

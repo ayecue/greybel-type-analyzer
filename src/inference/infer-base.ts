@@ -7,6 +7,7 @@ import { SignatureDefinitionBaseType } from 'meta-utils';
 import {
   ASTBase,
   ASTBaseBlockWithScope,
+  ASTBinaryExpression,
   ASTBooleanLiteral,
   ASTComment,
   ASTComparisonGroupExpression,
@@ -37,7 +38,9 @@ import {
 import {
   ISA_PROPERTY,
   isFunctionType,
+  isListType,
   isMapType,
+  isUnionType,
   IType,
   MAX_STRING_LENGTH,
   NIL_TYPE_ID,
@@ -48,6 +51,7 @@ import { determineTypeFromMeta } from '../utils/determine-type-from-meta';
 import { normalizeText } from '../utils/normalize-text';
 import { parseAssignDescription } from '../utils/parse-assign-description';
 import { InferContext } from './infer-context';
+import { shallowMergeList, shallowMergeMap } from '../utils/merge-helper';
 
 export abstract class InferBase {
   protected context: InferContext;
@@ -471,6 +475,136 @@ export abstract class InferBase {
     this.value = null;
 
     return type;
+  }
+
+  protected handleBinaryAddOperation(
+    left: IType,
+    right: IType
+  ): IType {
+    const leftKey = left.getKeyType();
+    const rightKey = right.getKeyType();
+
+    if (leftKey?.id === rightKey?.id) {
+      if (isMapType(left)) {
+        return shallowMergeMap(left, right);
+      } else if (isListType(left)) {
+        return shallowMergeList(left, right);
+      } else if (isUnionType(left)) {
+        return new UnionType(
+          this.context.typeStorage.generateId(TypeKind.UnionType),
+          [left, right],
+          this.context.typeStorage,
+          this.context.document,
+          this.context.scope,
+          null
+        );
+      }
+
+      return Type.createBaseType(
+        left.id,
+        this.context.typeStorage,
+        this.context.document,
+        this.context.scope,
+        null
+      );
+    }
+
+    if (
+      left.id === SignatureDefinitionBaseType.String ||
+      right.id === SignatureDefinitionBaseType.String
+    ) {
+      // If one of the types is a string, we return a string type
+      return Type.createBaseType(
+        SignatureDefinitionBaseType.String,
+        this.context.typeStorage,
+        this.context.document,
+        this.context.scope,
+        null
+      );
+    } else if (
+      left.id === SignatureDefinitionBaseType.Number ||
+      right.id === SignatureDefinitionBaseType.Number
+    ) {
+      // If one of the types is a number, we return a number type
+      return Type.createBaseType(
+        SignatureDefinitionBaseType.Number,
+        this.context.typeStorage,
+        this.context.document,
+        this.context.scope,
+        null
+      );
+    }
+
+    return Type.createBaseType(
+      NIL_TYPE_ID,
+      this.context.typeStorage,
+      this.context.document,
+      this.context.scope,
+      null
+    );
+  }
+
+  protected handleBinaryMultiplyOperation(
+    left: IType,
+    right: IType
+  ): IType {
+    if (
+      left.id === SignatureDefinitionBaseType.String &&
+      right.id === SignatureDefinitionBaseType.Number
+    ) {
+      return Type.createBaseType(
+        SignatureDefinitionBaseType.String,
+        this.context.typeStorage,
+        this.context.document,
+        this.context.scope,
+        null
+      );
+    } else if (
+      left.id === SignatureDefinitionBaseType.Number ||
+      right.id === SignatureDefinitionBaseType.Number
+    ) {
+      return Type.createBaseType(
+        SignatureDefinitionBaseType.Number,
+        this.context.typeStorage,
+        this.context.document,
+        this.context.scope,
+        null
+      );
+    }
+
+    return Type.createBaseType(
+      NIL_TYPE_ID,
+      this.context.typeStorage,
+      this.context.document,
+      this.context.scope,
+      null
+    );
+  }
+
+  protected handleDefaultMathOperation(
+    left: IType,
+    right: IType
+  ): IType {
+    if (
+      left.id === SignatureDefinitionBaseType.Number ||
+      right.id === SignatureDefinitionBaseType.Number
+    ) {
+      return Type.createBaseType(
+        SignatureDefinitionBaseType.Number,
+        this.context.typeStorage,
+        this.context.document,
+        this.context.scope,
+        null
+      );
+    }
+
+    return Type.createBaseType(
+      SignatureDefinitionBaseType.Any,
+      this.context.typeStorage,
+      this.context.document,
+      this.context.scope,
+      null
+    );
   }
 
   protected inferParenthesisExpression(item: ASTParenthesisExpression): IType {
