@@ -35,6 +35,7 @@ import {
   isUnionType,
   isUnknownType,
   IType,
+  NIL_TYPE_ID,
   TypeKind
 } from '../types/type';
 
@@ -359,6 +360,15 @@ export class ASTDefinitionAggregator {
       // If the iterator is a string type, we need to create a new string type for the variable
       return Type.createBaseType(
         SignatureDefinitionBaseType.String,
+        this.typeStorage,
+        this.document,
+        this.scope,
+        astRef
+      );
+    } else if (iterator.id === NIL_TYPE_ID) {
+      // If the iterator is a string type, we need to create a new string type for the variable
+      return Type.createBaseType(
+        NIL_TYPE_ID,
         this.typeStorage,
         this.document,
         this.scope,
