@@ -13,6 +13,7 @@ import {
 } from 'miniscript-core';
 
 import { ASTDefinitionAggregator } from '../aggregator/ast-definition-aggregator';
+import { ASTSignatureAggregator } from '../aggregator/ast-signature-aggregator';
 import { InferContext } from '../inference/infer-context';
 import { InferFullExpression } from '../inference/infer-full-expression';
 import { InferLightExpression } from '../inference/infer-light-expression';
@@ -286,6 +287,19 @@ export class Document implements IDocument {
     scopeMetadata.state = ScopeState.Resolved;
   }
 
+  aggregateVirtualSignatures(): void {
+    const root = this.chunk;
+    const aggregator = new ASTSignatureAggregator(
+      this.typeStorage,
+      this,
+      this.globals,
+      root
+    );
+
+    aggregator.aggregate();
+    aggregator.evaluate();
+  }
+
   aggregateDefinitions(): void {
     const root = this.chunk;
 
@@ -392,6 +406,7 @@ export class Document implements IDocument {
       );
     }
 
+    newDocument.aggregateVirtualSignatures();
     newDocument.aggregateDefinitions();
 
     return newDocument;

@@ -261,9 +261,7 @@ export class MapType extends Type implements IMapType {
     return true;
   }
 
-  getAllProperties(
-    depth: number = 1
-  ): PropertyInfo[] {
+  getAllProperties(depth: number = 1): PropertyInfo[] {
     if (depth > MAX_ALL_PROPERTIES_DEPTH) return [];
     const properties: Map<string, PropertyInfo> = new Map();
 

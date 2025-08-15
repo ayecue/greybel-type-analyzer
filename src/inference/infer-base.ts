@@ -7,7 +7,6 @@ import { SignatureDefinitionBaseType } from 'meta-utils';
 import {
   ASTBase,
   ASTBaseBlockWithScope,
-  ASTBinaryExpression,
   ASTBooleanLiteral,
   ASTComment,
   ASTComparisonGroupExpression,
@@ -48,10 +47,10 @@ import {
 } from '../types/type';
 import { assumeCompletionItemKind } from '../utils/assume-completion-item-kind';
 import { determineTypeFromMeta } from '../utils/determine-type-from-meta';
+import { shallowMergeList, shallowMergeMap } from '../utils/merge-helper';
 import { normalizeText } from '../utils/normalize-text';
 import { parseAssignDescription } from '../utils/parse-assign-description';
 import { InferContext } from './infer-context';
-import { shallowMergeList, shallowMergeMap } from '../utils/merge-helper';
 
 export abstract class InferBase {
   protected context: InferContext;
@@ -477,10 +476,7 @@ export abstract class InferBase {
     return type;
   }
 
-  protected handleBinaryAddOperation(
-    left: IType,
-    right: IType
-  ): IType {
+  protected handleBinaryAddOperation(left: IType, right: IType): IType {
     const leftKey = left.getKeyType();
     const rightKey = right.getKeyType();
 
@@ -544,10 +540,7 @@ export abstract class InferBase {
     );
   }
 
-  protected handleBinaryMultiplyOperation(
-    left: IType,
-    right: IType
-  ): IType {
+  protected handleBinaryMultiplyOperation(left: IType, right: IType): IType {
     if (
       left.id === SignatureDefinitionBaseType.String &&
       right.id === SignatureDefinitionBaseType.Number
@@ -581,10 +574,7 @@ export abstract class InferBase {
     );
   }
 
-  protected handleDefaultMathOperation(
-    left: IType,
-    right: IType
-  ): IType {
+  protected handleDefaultMathOperation(left: IType, right: IType): IType {
     if (
       left.id === SignatureDefinitionBaseType.Number ||
       right.id === SignatureDefinitionBaseType.Number

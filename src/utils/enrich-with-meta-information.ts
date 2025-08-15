@@ -129,7 +129,7 @@ export function enrichWithMetaInformation(
     return SignatureDefinitionFunction.parse(META_DOCS_SIGNATURE_ORIGIN, {
       id: typeStorage.generateId(TypeKind.FunctionType),
       type: SignatureDefinitionBaseType.Function,
-      arguments: item.getArguments().map((item, index) => {
+      arguments: item.getArguments().map((item) => {
         const label = item.getLabel();
         const types = item.getTypes().map((it) => it.toString());
         const opt = item.isOptional();

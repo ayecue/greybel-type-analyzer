@@ -304,7 +304,7 @@ export class ClassType extends Type implements IClassType {
     typeStorage?: ITypeStorage,
     document?: IDocument,
     scope?: IScope,
-    astRef?: ASTBase
+    _astRef?: ASTBase
   ): Type {
     const copiedClass = new ClassType(
       this.id,

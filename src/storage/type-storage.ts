@@ -28,7 +28,7 @@ export class TypeStorage implements ITypeStorage {
     this.__internalHandleCounter = 0;
   }
 
-  addToAny(key: KeyValue, info: IEntityInfo): void {
+  addToAny(_key: KeyValue, _info: IEntityInfo): void {
     /* By default it should not add anything to any */
   }
 

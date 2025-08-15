@@ -1,4 +1,5 @@
 import { Operator } from 'miniscript-core';
+
 import type { IDocument } from './document';
 import type { IScope } from './scope';
 
@@ -40,8 +41,8 @@ export enum PathType {
   Number = '$number',
   Nil = 'null',
   Slice = '[:]',
-  Function = 'function',
-  Expression = ':expression:'
+  Function = '$funcRef',
+  Expression = '$expr'
 }
 
 export interface IInferContext {
@@ -49,15 +50,12 @@ export interface IInferContext {
   readonly scope: IScope;
 }
 
-
-export const SIMPLE_BINARY_OPERATORS_SET: Set<string> = new Set(
-  [
-    Operator.Modulo,
-    Operator.Equal,
-    Operator.NotEqual,
-    Operator.GreaterThan,
-    Operator.GreaterThanOrEqual,
-    Operator.LessThan,
-    Operator.LessThanOrEqual
-  ]
-);
+export const SIMPLE_BINARY_OPERATORS_SET: Set<string> = new Set([
+  Operator.Modulo,
+  Operator.Equal,
+  Operator.NotEqual,
+  Operator.GreaterThan,
+  Operator.GreaterThanOrEqual,
+  Operator.LessThan,
+  Operator.LessThanOrEqual
+]);

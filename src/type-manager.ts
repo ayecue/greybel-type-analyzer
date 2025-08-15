@@ -36,6 +36,7 @@ export class TypeManager implements ITypeManager {
 
   analyze(identifier: string, chunk: ASTChunk): Document {
     const document = new Document(identifier, chunk, this, this.typeStorage);
+    document.aggregateVirtualSignatures();
     document.aggregateScopes();
     document.aggregateDefinitions();
     this.documents.set(identifier, document);

@@ -99,7 +99,7 @@ export class Type implements IType {
     return this.typeStorage.getKeyType(this);
   }
 
-  setProperty(key: KeyValue, info: EntityInfo): void {
+  setProperty(_key: KeyValue, _info: EntityInfo): void {
     /* ignore set */
   }
 

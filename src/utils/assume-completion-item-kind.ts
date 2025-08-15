@@ -34,6 +34,7 @@ export function assumeCompletionItemKind(
         case NIL_TYPE_ID:
           return CompletionItemKind.Literal;
       }
+      return varKind;
     default:
       return varKind;
   }

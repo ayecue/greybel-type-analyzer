@@ -55,7 +55,6 @@ import {
   IMapType,
   ISA_PROPERTY,
   isFunctionType,
-  isListType,
   isMapType,
   isUnionType,
   IType,
@@ -64,7 +63,6 @@ import {
 } from '../types/type';
 import { determineTypeFromMeta } from '../utils/determine-type-from-meta';
 import { enrichWithMetaInformation } from '../utils/enrich-with-meta-information';
-import { shallowMergeList, shallowMergeMap } from '../utils/merge-helper';
 import { parseMapDescription } from '../utils/parse-map-description';
 import { InferBase } from './infer-base';
 import { InferLightExpression } from './infer-light-expression';

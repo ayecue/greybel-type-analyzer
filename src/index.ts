@@ -26,6 +26,7 @@ export { InferLightExpression } from './inference/infer-light-expression';
 
 // Aggregator classes
 export { ASTDefinitionAggregator } from './aggregator/ast-definition-aggregator';
+export { ASTSignatureAggregator } from './aggregator/ast-signature-aggregator';
 
 // Type interfaces and enums
 export type {

@@ -41,14 +41,7 @@ import {
   PathType,
   SIMPLE_BINARY_OPERATORS_SET
 } from '../types/inference';
-import {
-  isFunctionType,
-  isListType,
-  isMapType,
-  isUnionType,
-  IType,
-  TypeKind
-} from '../types/type';
+import { isFunctionType, isUnionType, IType, TypeKind } from '../types/type';
 import { InferBase } from './infer-base';
 
 export class InferLightExpression extends InferBase {

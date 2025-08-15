@@ -1563,4 +1563,125 @@ describe('type-manager', () => {
       ]);
     });
   });
+
+  describe('create a virtual type', () => {
+    test('should resolve virtual type property', () => {
+      const doc = getDocument(`
+        // @vtype myOtherType
+        // @property {map<string,string>} moo
+
+        // @vtype myCustomType
+        // @extends myOtherType
+        // @function foo
+          // @params {string} bar
+          // @returns {string}
+          // @description This is a custom type with a function
+          // @example Example usage of myCustomType
+        // @property {number} myProperty
+
+        // @define {myCustomType}
+        bar = {}
+
+        test = bar.moo
+      `);
+      const scope = doc.globals;
+
+      expect(scope.getProperty('test').type.toMeta()).toEqual([{
+        type: 'map',
+        keyType: { type: 'string' },
+        valueType: { type: 'string' }
+      }]);
+    });
+
+    test('should resolve virtual type within virtual type', () => {
+      const doc = getDocument(`
+        // @vtype myOtherType
+        // @property {map<string,string>} moo
+
+        // @vtype myCustomType
+        // @extends myOtherType
+        // @function foo
+          // @params {string} bar
+          // @returns {string}
+          // @description This is a custom type with a function
+          // @example Example usage of myCustomType
+        // @property {number} myProperty
+
+        // @vtype myFooType
+        // @property {myCustomType} ct
+
+        // @define {myFooType}
+        bar = {}
+
+        test = bar.ct.moo
+      `);
+      const scope = doc.globals;
+
+      expect(scope.getProperty('test').type.toMeta()).toEqual([{
+        type: 'map',
+        keyType: { type: 'string' },
+        valueType: { type: 'string' }
+      }]);
+    });
+
+    test('should resolve virtual type from invoke', () => {
+      const doc = getDocument(`
+        // @vtype myOtherType
+        // @property {map<string,string>} moo
+
+        // @vtype myCustomType
+        // @extends myOtherType
+        // @property {number} myProperty
+
+        // @vtype myFooType
+        // @function foo
+          // @params {string} bar
+          // @returns {myCustomType}
+          // @description This is a custom type with a function
+          // @example Example usage of myCustomType
+
+        // @define {myFooType}
+        bar = {}
+
+        test = bar.foo().moo
+      `);
+      const scope = doc.globals;
+
+      expect(scope.getProperty('test').type.toMeta()).toEqual([{
+        type: 'map',
+        keyType: { type: 'string' },
+        valueType: { type: 'string' }
+      }]);
+    });
+
+    test('should resolve virtual type property when merged', () => {
+      const doc = getDocument(`
+        // @vtype myOtherType
+        // @property {map<string,string>} moo
+      `);
+      const doc2 = getDocument(`
+        // @vtype myCustomType
+        // @extends myOtherType
+        // @function foo
+          // @params {string} bar
+          // @returns {string}
+          // @description This is a custom type with a function
+          // @example Example usage of myCustomType
+        // @property {number} myProperty
+
+        // @define {myCustomType}
+        bar = {}
+
+        test = bar.moo
+      `);
+      const mergedDoc = doc2.merge({ document: doc });
+      const scope = mergedDoc.globals;
+
+      expect(scope.getProperty('test').type.toMeta()).toEqual([{
+        type: 'map',
+        keyType: { type: 'string' },
+        valueType: { type: 'string' }
+      }]);
+    });
+  });
 });
