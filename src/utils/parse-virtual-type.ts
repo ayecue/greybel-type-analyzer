@@ -146,7 +146,7 @@ class VirtualTypeParser {
     }
 
     while (this.pointer < this.block.tags.length) {
-      const tag = this.block.tags[this.pointer];
+      const tag = this.block.tags[this.pointer++];
 
       switch (tag.tag) {
         case VirtualTypeTag.Extends:
@@ -170,7 +170,6 @@ class VirtualTypeParser {
           // Ignore unsupported tags
           break;
       }
-      this.pointer++;
     }
 
     return this.virtualType;
