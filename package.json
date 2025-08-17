@@ -1,6 +1,6 @@
 {
   "name": "greybel-type-analyzer",
-  "version": "1.0.17",
+  "version": "1.1.0",
   "description": "",
   "main": "dist/index",
   "typings": "dist/index",
@@ -48,7 +48,7 @@
     "eslint-plugin-promise": "^6.0.0",
     "eslint-plugin-security": "^1.5.0",
     "eslint-plugin-simple-import-sort": "^7.0.0",
-    "greyscript-core": "^2.5.5",
+    "greyscript-core": "^2.6.0",
     "greyscript-meta": "~4.3.2",
     "jest": "^27.4.5",
     "miniscript-meta": "~1.4.0",
@@ -57,7 +57,7 @@
   },
   "dependencies": {
     "comment-parser": "^1.4.1",
-    "greybel-core": "~2.5.2",
+    "greybel-core": "~2.6.0",
     "meta-utils": "~3.0.0"
   }
 }

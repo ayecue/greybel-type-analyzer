@@ -17,7 +17,6 @@ import {
   VIRTUAL_TYPE_MAIN_TAG_REGEX,
   VirtualType
 } from '../utils/parse-virtual-type';
-import { ScopeCommentIterator } from '../utils/scope-comment-iterator';
 
 export interface RegistryItem {
   classRef: ClassType;
@@ -28,8 +27,9 @@ export class ASTSignatureAggregator {
   private typeStorage: ITypeStorage;
   private document: IDocument;
   private scope: IScope;
+  private chunk: ASTChunk;
 
-  private iterator: ScopeCommentIterator;
+  private pointer: number;
   private registry: Map<string, RegistryItem>;
 
   constructor(
@@ -41,26 +41,28 @@ export class ASTSignatureAggregator {
     this.typeStorage = typeStorage;
     this.document = document;
     this.scope = scope;
-    this.iterator = new ScopeCommentIterator(chunk, chunk);
+    this.pointer = 0;
+    this.chunk = chunk;
     this.registry = new Map<string, RegistryItem>();
   }
 
   private aggregateNextPayload(comment: ASTComment): string {
     let payload: string = comment.value;
-    let item = this.iterator.next();
+    let index = this.pointer + 1;
+    let nextAssociatedLine = comment.end.line + 1;
 
-    while (!item.done) {
-      const currentItem = item.value;
+    for (; index < this.chunk.comments.length; index++) {
+      const currentItem = this.chunk.comments[index];
 
-      if (currentItem?.type !== ASTType.Comment) {
+      if (nextAssociatedLine < currentItem.start.line) {
         break;
       }
 
-      payload += '\n' + (currentItem as ASTComment).value;
-      item = this.iterator.next();
+      payload += '\n' + currentItem.value;
+      nextAssociatedLine = currentItem.end.line + 1;
     }
 
-    this.iterator.rollback();
+    this.pointer = index - 1;
 
     return payload;
   }
@@ -107,16 +109,10 @@ export class ASTSignatureAggregator {
   }
 
   aggregate(): void {
-    let item = this.iterator.next();
-
-    while (!item.done) {
-      const currentItem = item.value;
-
-      if (currentItem?.type === ASTType.Comment) {
-        this.aggregateVirtualTypeFromComment(currentItem as ASTComment);
-      }
-
-      item = this.iterator.next();
+    for (; this.pointer < this.chunk.comments.length; this.pointer++) {
+      const currentItem = this.chunk.comments[this.pointer];
+      if (currentItem.scope !== this.chunk) continue;
+      this.aggregateVirtualTypeFromComment(currentItem);
     }
   }
 
