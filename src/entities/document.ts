@@ -387,6 +387,7 @@ export class Document implements IDocument {
     // first merge the type storages
     for (let index = 0; index < externals.length; index++) {
       const external = externals[index];
+      if (external.document == null) continue;
       newDocument.typeStorage.merge(external.document.typeStorage);
       this.typeManager.modifyTypeStorageMerge?.(
         newDocument,
@@ -398,6 +399,7 @@ export class Document implements IDocument {
     // assign namespaces from external documents
     for (let index = 0; index < externals.length; index++) {
       const external = externals[index];
+       if (external.document == null) continue;
       mergeScope(
         newDocument.typeStorage,
         newDocument.globals,
