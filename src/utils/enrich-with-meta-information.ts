@@ -18,7 +18,8 @@ export enum FunctionBlockTag {
   Params = 'params',
   Return = 'return',
   Returns = 'returns',
-  Example = 'example'
+  Example = 'example',
+  Hidden = 'hidden'
 }
 
 const AllowedFunctionBlockTags: Set<string> = new Set(
@@ -64,6 +65,7 @@ interface FunctionBlockDefinition {
   args?: SignaturePayloadDefinitionArg[];
   returns?: SignaturePayloadDefinitionTypeMeta[];
   examples?: string[];
+  isHidden?: boolean;
 }
 
 function parseFunctionBlock(def: Block): FunctionBlockDefinition {
@@ -92,11 +94,13 @@ function parseFunctionBlock(def: Block): FunctionBlockDefinition {
   const examples = def.tags
     .filter((it) => it.tag === FunctionBlockTag.Example)
     .map(parseExample);
+  const hiddenTag = def.tags.find((it) => it.tag === FunctionBlockTag.Hidden);
 
   if (descriptions.length > 0) definition.descriptions = descriptions;
   if (args.length > 0) definition.args = args;
   if (returns.length > 0) definition.returns = returns;
   if (examples.length > 0) definition.examples = examples;
+  if (hiddenTag) definition.isHidden = true;
 
   return definition;
 }
@@ -118,8 +122,10 @@ export function enrichWithMetaInformation(
       descriptions: commentDescription,
       args: commentArgs,
       returns: commentReturn,
-      examples: commentExample
+      examples: commentExample,
+      isHidden: commentIsHidden
     } = parseFunctionBlock(commentDef);
+
     const commentsArgMap = new Map<string, SignaturePayloadDefinitionArg>();
 
     if (commentArgs) {
@@ -142,7 +148,7 @@ export function enrichWithMetaInformation(
         };
       }),
       returns: commentReturn || item.getReturns(),
-      description: commentDescription || DEFAULT_CUSTOM_FUNCTION_DESCRIPTION,
+      description: commentIsHidden ? null : (commentDescription || DEFAULT_CUSTOM_FUNCTION_DESCRIPTION),
       example: commentExample || item.getExample()
     }) as SignatureDefinitionFunction;
   }
