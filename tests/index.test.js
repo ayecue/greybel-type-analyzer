@@ -166,6 +166,37 @@ describe('type-manager', () => {
     });
   });
 
+  describe('lists', () => {
+    test('should return entity', () => {
+      const doc = getDocument(`
+        // @define {list<string>}
+        result = []
+        chosenIdx = "1"
+        chosenIdx = 0
+        selectedItem = result[chosenIdx]
+      `);
+      const scope = doc.globals;
+      const item = scope.getProperty('selectedItem').type;
+
+      expect(item.id).toEqual('string');
+    });
+
+    test('should return entity with multiple types', () => {
+      const doc = getDocument(`
+        // @define {list<string>|list<number>}
+        result = []
+        chosenIdx = "1"
+        chosenIdx = 0
+        selectedItem = result[chosenIdx]
+      `);
+      const scope = doc.globals;
+      const item = scope.getProperty('selectedItem').type;
+
+      expect(isUnionType(item)).toEqual(true);
+      expect(item.variants.map((it) => it.getKeyType().id)).toEqual(['string', 'number']);
+    });
+  });
+
   describe('non identifier base', () => {
     test('should return entity from string literal', () => {
       const doc = getDocument(`

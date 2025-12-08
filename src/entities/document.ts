@@ -399,7 +399,7 @@ export class Document implements IDocument {
     // assign namespaces from external documents
     for (let index = 0; index < externals.length; index++) {
       const external = externals[index];
-       if (external.document == null) continue;
+      if (external.document == null) continue;
       mergeScope(
         newDocument.typeStorage,
         newDocument.globals,

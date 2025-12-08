@@ -148,7 +148,9 @@ export function enrichWithMetaInformation(
         };
       }),
       returns: commentReturn || item.getReturns(),
-      description: commentIsHidden ? null : (commentDescription || DEFAULT_CUSTOM_FUNCTION_DESCRIPTION),
+      description: commentIsHidden
+        ? null
+        : commentDescription || DEFAULT_CUSTOM_FUNCTION_DESCRIPTION,
       example: commentExample || item.getExample()
     }) as SignatureDefinitionFunction;
   }

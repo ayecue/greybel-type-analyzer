@@ -287,7 +287,7 @@ export class InferFullExpression extends InferBase {
           null
         );
       } else if (variants.length === 1) {
-        return index.firstVariant();
+        return variants[0];
       }
 
       return new UnionType(
