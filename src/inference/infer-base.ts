@@ -8,7 +8,6 @@ import {
   ASTBase,
   ASTBaseBlockWithScope,
   ASTBooleanLiteral,
-  ASTComment,
   ASTComparisonGroupExpression,
   ASTIdentifier,
   ASTIsaExpression,
@@ -121,34 +120,43 @@ export abstract class InferBase {
   }
 
   protected resolveRelatedCommentLines(item: ASTBase): string[] | null {
-    const chunkHelper = this.context.document.chunkHelper;
-    const previousItem = chunkHelper.getLastASTItemOfLine(item.start.line - 1);
-    const currentItem = chunkHelper.findASTItemInLine(
-      item.start.line,
-      ASTType.Comment
+    // First try leadingComments / trailingComments (available in preserve mode)
+    if (item.leadingComments && item.leadingComments.length > 0) {
+      return item.leadingComments.map((c) => normalizeText(c));
+    }
+    if (item.trailingComments && item.trailingComments.length > 0) {
+      return [normalizeText(item.trailingComments[0])];
+    }
+
+    // Fallback: search chunk.comments by line position
+    const comments = this.context.document.chunk.comments;
+    const targetLine = item.startLine;
+
+    // Look for a comment on the same line as the item
+    const sameLineComment = comments.find(
+      (c) => c.startLine === targetLine
     );
+    if (sameLineComment) {
+      return [normalizeText(sameLineComment.value)];
+    }
 
-    if (previousItem?.type === ASTType.Comment) {
-      const visited: Set<ASTBase> = new Set();
+    // Look for contiguous comment block ending on the line above the item
+    const previousLineComment = comments.find(
+      (c) => c.endLine === targetLine - 1
+    );
+    if (previousLineComment) {
       const lines: string[] = [];
-      let index = item.start.line - 1;
+      let nextLine = previousLineComment.startLine;
 
-      while (index >= 0) {
-        const item = chunkHelper.getLastASTItemOfLine(index--);
-
-        if (visited.has(item)) continue;
-
-        if (item?.type === ASTType.Comment) {
-          visited.add(item);
-          lines.unshift(normalizeText((item as ASTComment).value));
-        } else {
-          break;
-        }
+      // Walk backwards to collect the full contiguous comment block
+      for (let i = comments.indexOf(previousLineComment); i >= 0; i--) {
+        const c = comments[i];
+        if (c.endLine < nextLine - 1) break;
+        lines.unshift(normalizeText(c.value));
+        nextLine = c.startLine;
       }
 
       return lines;
-    } else if (currentItem?.type === ASTType.Comment) {
-      return [normalizeText((currentItem as ASTComment).value)];
     }
 
     return null;

@@ -440,8 +440,8 @@ export class ASTDefinitionAggregator {
         {
           document: this.document.name,
           astRef: item,
-          start: identifier.start,
-          end: identifier.end
+          start: { line: identifier.startLine, character: identifier.startChar },
+          end: { line: identifier.endLine, character: identifier.endChar }
         }
       ],
       assignmentRef: item

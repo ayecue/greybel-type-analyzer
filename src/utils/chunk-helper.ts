@@ -24,7 +24,7 @@ export class ChunkHelper implements IChunkHelper {
   }
 
   getLastASTItemOfLine(line: number): ASTBase {
-    const items = this._root.lines[line];
+    const items = this._root.lines.get(line);
 
     if (!items || items.length === 0) return null;
 
@@ -34,9 +34,9 @@ export class ChunkHelper implements IChunkHelper {
       const current = items[i];
 
       if (
-        current.start.line > lastItem.start.line ||
-        (current.start.line === lastItem.start.line &&
-          current.start.character > lastItem.start.character)
+        current.startLine > lastItem.startLine ||
+        (current.startLine === lastItem.startLine &&
+          current.startChar > lastItem.startChar)
       ) {
         lastItem = current;
       }
@@ -46,7 +46,7 @@ export class ChunkHelper implements IChunkHelper {
   }
 
   findASTItemInLine(line: number, type: ASTType): ASTBase {
-    const items = this._root.lines[line];
+    const items = this._root.lines.get(line);
 
     if (items && items.length > 0) {
       const result = items.find((item) => item.type === type);

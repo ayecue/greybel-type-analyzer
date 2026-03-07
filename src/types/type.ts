@@ -6,7 +6,7 @@ import {
   SignatureDefinitionType,
   SignaturePayloadDefinitionType
 } from 'meta-utils';
-import type { ASTBase, ASTPosition } from 'miniscript-core';
+import type { ASTBase } from 'miniscript-core';
 
 import { CompletionItemKind } from './completion';
 import type { IDocument } from './document';
@@ -41,8 +41,8 @@ export type KeyValue = string | IKeyType;
 export type TypeSource = {
   document?: string;
   astRef: ASTBase;
-  start: ASTPosition;
-  end: ASTPosition;
+  start: { line: number; character: number };
+  end: { line: number; character: number };
 };
 export const DEFAULT_SOURCE_DOCUMENT_ID = 'unknown' as const;
 

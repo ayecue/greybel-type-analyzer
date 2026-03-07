@@ -103,7 +103,7 @@ export class InferLightExpression extends InferBase {
     switch (item.operator) {
       case Operator.Plus:
         return this.handleBinaryAddOperation(left, right);
-      case Operator.Asterik:
+      case Operator.Asterisk:
         return this.handleBinaryMultiplyOperation(left, right);
       default:
         return this.handleDefaultMathOperation(left, right);

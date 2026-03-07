@@ -128,7 +128,7 @@ export class TypeStorage implements ITypeStorage {
 
   generateId(type: TypeKind, astRef?: ASTBase): string {
     const identifier = astRef
-      ? `<${astRef.type}:${astRef.start.toString()}-${astRef.end.toString()}>`
+      ? `<${astRef.type}:${astRef.startLine}:${astRef.startChar}-${astRef.endLine}:${astRef.endChar}>`
       : '<virtual>';
     return `${type}-global-${this.__internalHandleCounter++}-${identifier}`;
   }

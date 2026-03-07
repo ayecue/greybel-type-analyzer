@@ -283,8 +283,8 @@ describe('type-manager', () => {
         globals.remove
         remove
       `);
-      const lineA = doc.chunk.lines[2][0];
-      const lineB = doc.chunk.lines[3][0];
+      const lineA = doc.chunk.lines.get(2)[0];
+      const lineB = doc.chunk.lines.get(3)[0];
       const itemA = doc.resolveNamespace(lineA, false).item;
       const itemB = doc.resolveNamespace(lineB, false).item;
 
@@ -862,7 +862,7 @@ describe('type-manager', () => {
           self.foo
         end function
       `);
-      const line = doc.chunk.lines[5][0];
+      const line = doc.chunk.lines.get(5)[0];
       const item = doc.resolveNamespace(line, false).item;
 
       expect(item.id).toEqual('string');
@@ -897,9 +897,9 @@ describe('type-manager', () => {
           super
         end function
       `);
-      const lineA = doc.chunk.lines[4][0];
+      const lineA = doc.chunk.lines.get(4)[0];
       const itemA = doc.resolveNamespace(lineA, false).item;
-      const lineB = doc.chunk.lines[9][0];
+      const lineB = doc.chunk.lines.get(9)[0];
       const itemB = doc.resolveNamespace(lineB, false).item;
 
       expect(itemA.id).toEqual('any');
@@ -988,7 +988,7 @@ describe('type-manager', () => {
           end function
         end function
       `);
-      const line = doc.chunk.lines[11];
+      const line = doc.chunk.lines.get(11);
       const sources = doc.resolveAvailableAssignments(line[0]);
 
       expect(sources.length).toEqual(3);
@@ -1019,7 +1019,7 @@ describe('type-manager', () => {
         test.test
       `);
       const mergedDoc = doc2.merge({ document: doc1 });
-      const line = mergedDoc.chunk.lines[3];
+      const line = mergedDoc.chunk.lines.get(3);
       const item = mergedDoc.resolveNamespace(line[0], false).item;
       const sources = item.getSource();
 
@@ -1050,7 +1050,7 @@ describe('type-manager', () => {
         Foo
       `);
       const mergedDoc = doc2.merge({ document: doc1 });
-      const line = mergedDoc.chunk.lines[4];
+      const line = mergedDoc.chunk.lines.get(4);
       const item = mergedDoc.resolveNamespace(line[0], false).item;
       const sources = item.getSource();
 
@@ -1067,7 +1067,7 @@ describe('type-manager', () => {
         test.abc
       `);
       const mergedDoc = doc2.merge({ document: doc1 });
-      const line = mergedDoc.chunk.lines[2];
+      const line = mergedDoc.chunk.lines.get(2);
       const item = mergedDoc.resolveNamespace(line[0], false).item;
       const sources = item.getSource();
 
@@ -1119,7 +1119,7 @@ describe('type-manager', () => {
         myVar.test
       `);
       const mergedDoc = doc2.merge({ document: doc1 });
-      const line = mergedDoc.chunk.lines[2];
+      const line = mergedDoc.chunk.lines.get(2);
       const item = mergedDoc.resolveNamespace(line[0], false).item;
       const sources = item.getSource();
 

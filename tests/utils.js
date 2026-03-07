@@ -1,10 +1,10 @@
-const { Parser } = require('greybel-core');
+const { Parser, UnsafeParser } = require('greybel-core');
 const { miniscriptMeta } = require('miniscript-meta');
 const { TypeManager, createProxyForNativeType, EntityInfo, persistTypeInNativeFunction } = require('../dist');
 const { SignatureDefinitionBaseType } = require('meta-utils');
 
 const parse = (code) => {
-  const parser = new Parser(code, { unsafe: true });
+  const parser = new UnsafeParser(code);
   return parser.parseChunk();
 };
 

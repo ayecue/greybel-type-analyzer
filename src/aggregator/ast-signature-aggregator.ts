@@ -4,7 +4,7 @@ import {
   SignatureDefinitionFunction,
   SignaturePayloadDefinitionFunction
 } from 'meta-utils';
-import { ASTChunk, ASTComment, ASTType } from 'miniscript-core';
+import { ASTChunk, Comment } from 'miniscript-core';
 
 import { ClassType } from '../entities/class-type';
 import { KeyType } from '../entities/key-type';
@@ -46,20 +46,20 @@ export class ASTSignatureAggregator {
     this.registry = new Map<string, RegistryItem>();
   }
 
-  private aggregateNextPayload(comment: ASTComment): string {
+  private aggregateNextPayload(comment: Comment): string {
     let payload: string = comment.value;
     let index = this.pointer + 1;
-    let nextAssociatedLine = comment.end.line + 1;
+    let nextAssociatedLine = comment.endLine + 1;
 
     for (; index < this.chunk.comments.length; index++) {
       const currentItem = this.chunk.comments[index];
 
-      if (nextAssociatedLine < currentItem.start.line) {
+      if (nextAssociatedLine < currentItem.startLine) {
         break;
       }
 
       payload += '\n' + currentItem.value;
-      nextAssociatedLine = currentItem.end.line + 1;
+      nextAssociatedLine = currentItem.endLine + 1;
     }
 
     this.pointer = index - 1;
@@ -67,7 +67,7 @@ export class ASTSignatureAggregator {
     return payload;
   }
 
-  private aggregateVirtualTypeFromComment(comment: ASTComment): void {
+  private aggregateVirtualTypeFromComment(comment: Comment): void {
     const line = comment.value.trimLeft();
 
     if (!line.startsWith(VIRTUAL_TYPE_MAIN_TAG)) {
@@ -111,7 +111,6 @@ export class ASTSignatureAggregator {
   aggregate(): void {
     for (; this.pointer < this.chunk.comments.length; this.pointer++) {
       const currentItem = this.chunk.comments[this.pointer];
-      if (currentItem.scope !== this.chunk) continue;
       this.aggregateVirtualTypeFromComment(currentItem);
     }
   }

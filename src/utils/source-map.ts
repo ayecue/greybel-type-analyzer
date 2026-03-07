@@ -1,4 +1,4 @@
-import { ASTBase, ASTPosition } from 'miniscript-core';
+import { ASTBase } from 'miniscript-core';
 
 import { IDocument } from '../types/document';
 import {
@@ -12,8 +12,8 @@ export class SourceMap implements ISourceMap {
 
   static createTypeSourceMapKey(
     document: IDocument | undefined,
-    start: ASTPosition,
-    end: ASTPosition
+    start: { line: number; character: number },
+    end: { line: number; character: number }
   ): string {
     return `${document?.name || DEFAULT_SOURCE_DOCUMENT_ID}||${start.line}:${start.character}||${end.line}:${end.character}`;
   }
@@ -50,8 +50,8 @@ export class SourceMap implements ISourceMap {
   add(document: IDocument | undefined, astRef: ASTBase): this {
     const key = SourceMap.createTypeSourceMapKey(
       document,
-      astRef.start,
-      astRef.end
+      { line: astRef.startLine, character: astRef.startChar },
+      { line: astRef.endLine, character: astRef.endChar }
     );
     this.map.set(key, astRef);
     return this;
