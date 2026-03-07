@@ -133,9 +133,7 @@ export abstract class InferBase {
     const targetLine = item.startLine;
 
     // Look for a comment on the same line as the item
-    const sameLineComment = comments.find(
-      (c) => c.startLine === targetLine
-    );
+    const sameLineComment = comments.find((c) => c.startLine === targetLine);
     if (sameLineComment) {
       return [normalizeText(sameLineComment.value)];
     }
