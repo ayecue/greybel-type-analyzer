@@ -132,11 +132,29 @@ class VirtualTypeParser {
 
   private parseProperty(tag: Spec): void {
     const propertyName = tag.name;
+    const parsedType = tag.type
+      ? new TypeParser(tag.type).parse()
+      : SignatureDefinitionBaseType.Any;
+    const typeStr =
+      typeof parsedType === 'string' ? parsedType : parsedType.type;
+
+    if (typeStr === SignatureDefinitionBaseType.Function) {
+      // Function-typed properties need a full function definition payload
+      // so that SignatureDefinitionFunction.parse() is used in evaluate()
+      const functionDef: SignaturePayloadDefinitionFunction = {
+        id: `${this.virtualType.type}:${propertyName}`,
+        type: SignatureDefinitionBaseType.Function,
+        arguments: [],
+        returns: [SignatureDefinitionBaseType.Any],
+        example: null,
+        description: null
+      };
+      this.virtualType.definitions[propertyName] = functionDef;
+      return;
+    }
 
     this.virtualType.definitions[propertyName] = {
-      type: tag.type
-        ? new TypeParser(tag.type).parse()
-        : SignatureDefinitionBaseType.Any
+      type: parsedType
     };
   }
 

@@ -1714,5 +1714,40 @@ describe('type-manager', () => {
         valueType: { type: 'string' }
       }]);
     });
+
+    test('should resolve function-typed property from @property {function}', () => {
+      const doc = getDocument(`
+        // @vtype myCustomType
+        // @extends map
+        // @property {function} MyMethod
+
+        // @define {myCustomType}
+        test = null
+
+        x = test.MyMethod
+      `);
+      const scope = doc.globals;
+
+      // @property {function} creates a function with default return type any
+      // Member access auto-invokes and resolves to the return type
+      expect(scope.getProperty('x').type.toMeta()).toEqual([{ type: 'any' }]);
+    });
+
+    test('should resolve function-typed property when vtype overrides native class', () => {
+      const doc = getDocument(`
+        // @vtype crypto
+        // @extends map
+        // @property {function} MyMethod
+
+        // @define {crypto}
+        test = null
+
+        x = test.MyMethod
+      `);
+      const scope = doc.globals;
+
+      // Should not crash when vtype name matches a native greyscript-meta class
+      expect(scope.getProperty('x').type.toMeta()).toEqual([{ type: 'any' }]);
+    });
   });
 });
